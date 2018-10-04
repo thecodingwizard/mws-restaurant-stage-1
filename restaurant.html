@@ -44,6 +44,16 @@
       <!-- end restaurant -->
       <!-- Beginning reviews -->
       <section id="reviews-container">
+        <h2 id="reviews-title">Reviews</h2>
+        <section id="submit-review-container">
+          <form id="submit-review-form">
+            <input placeholder="Name" id="submit-review-form-name" name="name" required>
+            <input placeholder="Rating" id="submit-review-form-rating" name="rating" required type="number" min="1" max="5">
+            <input placeholder="Comments" id="submit-review-form-comments" name="comments" required>
+            <button id="submit-review-form-submit" type="submit">Submit Review</button>
+          </form>
+        </section>
+
         <ul id="reviews-list"></ul>
       </section>
       <!-- End reviews -->

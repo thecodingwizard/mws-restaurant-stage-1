@@ -1,6 +1,8 @@
 var db = new Dexie("udacity_mws_restaurant");
 db.version(1).stores({
-  restaurants: 'id,name,neighborhood,photograph,address,latlng,cuisine_type,operating_hours,reviews,createdAt,updatedAt'
+  restaurants: 'id',
+  reviews: "++id, restaurant_id",
+  outbox: "id",
 });
 
 /**
@@ -17,29 +19,35 @@ class DBHelper {
     return `http://localhost:${port}/restaurants`;
   }
 
+  static async submitReview(data) {
+    await db.reviews.add(data);
+    await db.outbox.add(data);
+  }
+
   /**
    * Fetch all restaurants.
    */
   static async fetchRestaurants(callback) {
-    let inDB = await db.restaurants.toArray();
-    console.log(inDB);
-    if (inDB.length != 0) {
-      callback(null, inDB);
+    let restaurants = await db.restaurants.toArray();
+    let reviews = await db.reviews.toArray();
+    if (restaurants.length != 0) {
+      callback(null, DBHelper.mergeReviews(restaurants, reviews));
     } else {
-      let xhr = new XMLHttpRequest();
-      xhr.open('GET', DBHelper.DATABASE_URL);
-      xhr.onload = () => {
-        if (xhr.status === 200) { // Got a success response from server!
-          const restaurants = JSON.parse(xhr.responseText);
-          db.restaurants.bulkAdd(restaurants);
-          callback(null, restaurants);
-        } else { // Oops!. Got an error from server.
-          const error = (`Request failed. Returned status of ${xhr.status}`);
-          callback(error, null);
-        }
-      };
-      xhr.send();
+      let restaurants = await (await fetch(DBHelper.DATABASE_URL)).json();
+      let reviews = await (await fetch("http://localhost:1337/reviews")).json();
+      db.restaurants.bulkAdd(restaurants);
+      db.reviews.bulkAdd(reviews);
+      callback(null, this.mergeReviews(restaurants, reviews));
     }
+  }
+
+  static mergeReviews(restaurants, reviews) {
+    return restaurants.map(restaurant => {
+      return {
+        ...restaurant,
+        reviews: reviews.filter(review => review.restaurant_id === restaurant.id)
+      };
+    });
   }
 
   /**

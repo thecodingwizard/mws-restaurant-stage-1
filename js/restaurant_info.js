@@ -6,6 +6,23 @@ var newMap;
  */
 document.addEventListener('DOMContentLoaded', (event) => {  
   initMap();
+
+  // Review Form Stuff
+  let reviewForm = document.querySelector("#submit-review-form");
+  let formName = document.querySelector("#submit-review-form-name");
+  let formRating = document.querySelector("#submit-review-form-rating");
+  let formComments = document.querySelector("#submit-review-form-comments");
+  reviewForm.addEventListener("submit", async e => {
+    e.preventDefault();
+    let data = {
+      restaurant_id: self.restaurant.id,
+      name: formName.value,
+      rating: formRating.value,
+      comments: formComments.value,
+    };
+    await DBHelper.submitReview(data);
+    window.location.reload();
+  });
 });
 
 /**
@@ -126,9 +143,6 @@ fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hours) => 
  */
 fillReviewsHTML = (reviews = self.restaurant.reviews) => {
   const container = document.getElementById('reviews-container');
-  const title = document.createElement('h2');
-  title.innerHTML = 'Reviews';
-  container.appendChild(title);
 
   if (!reviews) {
     const noReviews = document.createElement('p');
@@ -152,9 +166,9 @@ createReviewHTML = (review) => {
   name.innerHTML = review.name;
   li.appendChild(name);
 
-  const date = document.createElement('p');
-  date.innerHTML = review.date;
-  li.appendChild(date);
+  // const date = document.createElement('p');
+  // date.innerHTML = review.date;
+  // li.appendChild(date);
 
   const rating = document.createElement('p');
   rating.innerHTML = `Rating: ${review.rating}`;

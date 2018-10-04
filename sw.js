@@ -1,4 +1,13 @@
+importScripts("./js/dexie.js");
+
 var CACHE = "udacity-mws-restaurant-stage-1-v1";
+
+var db = new Dexie("udacity_mws_restaurant");
+db.version(1).stores({
+  restaurants: 'id',
+  reviews: "++id, restaurant_id",
+  outbox: "id",
+});
 
 self.addEventListener('install', function(evt) {
   console.log('The service worker is being installed.');
@@ -12,6 +21,19 @@ self.addEventListener("fetch", function(evt) {
   evt.respondWith(fromCache(evt.request));
  
   evt.waitUntil(update(evt.request));
+});
+
+self.addEventListener("sync", function(event) {
+  if (event.tag == "addReview") {
+    event.waitUntil(db.outbox.toArray().then(reviews => {
+      return Promise.all(reviews.map(review => {
+        return fetch("http://localhost:1337/reviews/", {
+          method: "POST",
+          body: JSON.stringify(review)
+        });
+      }))
+    }).then(() => db.outbox.clear()));
+  }
 });
 
 function precache() {
