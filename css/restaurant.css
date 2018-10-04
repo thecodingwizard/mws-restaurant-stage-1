@@ -61,3 +61,7 @@
 #submit-review-form-submit:hover {
   cursor: pointer;
 }
+
+#favorite {
+  margin-bottom: 2rem;
+}

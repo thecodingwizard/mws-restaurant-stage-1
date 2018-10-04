@@ -24,6 +24,10 @@ class DBHelper {
     await db.outbox.add(data);
   }
 
+  static async updFavorite(id, val) {
+    await db.restaurants.update(id, { isFavorite: val });
+  }
+
   /**
    * Fetch all restaurants.
    */

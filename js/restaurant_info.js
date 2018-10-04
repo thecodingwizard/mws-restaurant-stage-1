@@ -23,6 +23,13 @@ document.addEventListener('DOMContentLoaded', (event) => {
     await DBHelper.submitReview(data);
     window.location.reload();
   });
+
+  // favorite
+  let favorite = document.querySelector("#favorite");
+  favorite.addEventListener("click", async e => {
+    await DBHelper.updFavorite(self.restaurant.id, !!!self.restaurant.isFavorite);
+    window.location.reload();
+  });
 });
 
 /**
@@ -110,6 +117,12 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
 
   const cuisine = document.getElementById('restaurant-cuisine');
   cuisine.innerHTML = restaurant.cuisine_type;
+
+  if (restaurant.isFavorite) {
+    document.querySelector("#favorite").textContent = "Favorite: Yes";
+  } else {
+    document.querySelector("#favorite").textContent = "Favorite: No";
+  }
 
   // fill operating hours
   if (restaurant.operating_hours) {
