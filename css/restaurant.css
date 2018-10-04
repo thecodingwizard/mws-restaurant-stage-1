@@ -1,0 +1,41 @@
+#maincontent {
+  display: flex;
+}
+
+.left {
+  flex: 1;
+}
+.right {
+  flex: 1;
+}
+
+@media (min-width: 1200px) {
+  .inside #map-container {
+    background: blue none repeat scroll 0 0;
+    height: calc(100% - 80px);
+    position: fixed;
+    right: 0;
+    top: 80px;
+    width: 50%;
+  }
+  .inside #map {
+    background-color: #ccc;
+    height: 100%;
+    width: 100%;
+  }
+}
+
+@media (max-width: 1199px) {
+  #maincontent {
+    flex-direction: column;
+  }
+  #footer {
+    position: static !important;
+  }
+  .inside #map {
+    min-height: 550px;
+  }
+  #breadcrumb {
+    width: 100%;
+  }
+}
