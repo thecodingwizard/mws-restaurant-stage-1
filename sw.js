@@ -39,6 +39,7 @@ self.addEventListener("sync", function(event) {
 function precache() {
   return caches.open(CACHE).then(function (cache) {
     return cache.addAll([
+      "/",
       './index.html'
     ]);
   });
