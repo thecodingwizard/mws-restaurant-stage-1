@@ -1,5 +1,11 @@
 var CACHE = "udacity-mws-restaurant-stage-1-v1";
 
+self.addEventListener('install', function(evt) {
+  console.log('The service worker is being installed.');
+ 
+  evt.waitUntil(precache());
+});
+
 self.addEventListener("fetch", function(evt) {
   console.log("The service worker is serving the asset.");
 
@@ -7,6 +13,14 @@ self.addEventListener("fetch", function(evt) {
  
   evt.waitUntil(update(evt.request));
 });
+
+function precache() {
+  return caches.open(CACHE).then(function (cache) {
+    return cache.addAll([
+      './index.html'
+    ]);
+  });
+}
  
 function fromCache(request) {
   return caches.open(CACHE).then(function (cache) {

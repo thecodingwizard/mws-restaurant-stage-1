@@ -1,3 +1,8 @@
+var db = new Dexie("udacity_mws_restaurant");
+db.version(1).stores({
+  restaurants: 'id,name,neighborhood,photograph,address,latlng,cuisine_type,operating_hours,reviews,createdAt,updatedAt'
+});
+
 /**
  * Common database helper functions.
  */
@@ -15,19 +20,26 @@ class DBHelper {
   /**
    * Fetch all restaurants.
    */
-  static fetchRestaurants(callback) {
-    let xhr = new XMLHttpRequest();
-    xhr.open('GET', DBHelper.DATABASE_URL);
-    xhr.onload = () => {
-      if (xhr.status === 200) { // Got a success response from server!
-        const restaurants = JSON.parse(xhr.responseText);
-        callback(null, restaurants);
-      } else { // Oops!. Got an error from server.
-        const error = (`Request failed. Returned status of ${xhr.status}`);
-        callback(error, null);
-      }
-    };
-    xhr.send();
+  static async fetchRestaurants(callback) {
+    let inDB = await db.restaurants.toArray();
+    console.log(inDB);
+    if (inDB.length != 0) {
+      callback(null, inDB);
+    } else {
+      let xhr = new XMLHttpRequest();
+      xhr.open('GET', DBHelper.DATABASE_URL);
+      xhr.onload = () => {
+        if (xhr.status === 200) { // Got a success response from server!
+          const restaurants = JSON.parse(xhr.responseText);
+          db.restaurants.bulkAdd(restaurants);
+          callback(null, restaurants);
+        } else { // Oops!. Got an error from server.
+          const error = (`Request failed. Returned status of ${xhr.status}`);
+          callback(error, null);
+        }
+      };
+      xhr.send();
+    }
   }
 
   /**
